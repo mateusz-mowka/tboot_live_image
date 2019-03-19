@@ -1,0 +1,9 @@
+config BR2_PACKAGE_TBOOT
+	bool "tboot"
+	select BR2_PACKAGE_TROUSERS
+	help
+	  Trusted Boot (tboot) is an open source, pre- kernel/VMM module
+	  that uses Intel(R) Trusted Execution Technology (Intel(R) TXT)
+	  to perform a measured and verified launch of an OS kernel/VMM.
+
+	  https://sourceforge.net/projects/tboot/

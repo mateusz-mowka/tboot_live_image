@@ -1,0 +1,20 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		printf "Dump tboot logs to disk"
+		mkdir -p /mnt/logs
+		/root/tboot/utils/txt-stat > /mnt/logs/log-`date +%Y%m%d%H%M%S`
+		echo "done."
+		;;
+	stop)
+		;;
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+	*)
+		echo "usage: $0 {start|stop|restart}"
+		;;
+esac
