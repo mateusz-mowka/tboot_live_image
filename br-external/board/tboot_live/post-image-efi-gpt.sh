@@ -25,6 +25,15 @@ image_size=$(( last_lba + first_lba ))
 
 cp -f "$BOARD_DIR/grub.cfg" "efi-part/EFI/BOOT/grub.cfg"
 
+git_tag=$(git describe --abbrev=0 --tags)
+git_hash="$(git rev-parse HEAD)$(git diff-index --quiet HEAD -- || echo '!')"
+build_date=$(date -u)
+sed -i \
+-e "s/__GIT_TAG__/$git_tag/g" \
+-e "s/__GIT_HASH__/$git_hash/g" \
+-e "s/__BUILD_DATE__/$build_date/g" \
+"efi-part/EFI/BOOT/grub.cfg"
+
 # Create EFI system partition
 rm -f efi-part.vfat
 dd if=/dev/zero of=efi-part.vfat bs=512 count=0 seek=$efi_part_size

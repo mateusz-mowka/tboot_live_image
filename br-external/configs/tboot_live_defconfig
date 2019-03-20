@@ -47,5 +47,5 @@ BR2_PACKAGE_HOST_E2FSPROGS=y
 BR2_PACKAGE_HOST_MTOOLS=y
 BR2_PACKAGE_GRUB2_REPO=y
 BR2_TARGET_GRUB2_REPO_X86_64_EFI=y
-BR2_TARGET_GRUB2_REPO_BUILTIN_MODULES="boot linux ext2 fat squash4 part_msdos part_gpt normal relocator multiboot2 all_video gfxterm video font"
+BR2_TARGET_GRUB2_REPO_BUILTIN_MODULES="boot linux ext2 fat squash4 part_msdos part_gpt normal relocator multiboot2 all_video gfxterm video font echo"
 BR2_PACKAGE_TBOOT=y
