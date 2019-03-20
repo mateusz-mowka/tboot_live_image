@@ -20,11 +20,11 @@ echo mem > /sys/power/state
 sleep 5
 
 if [ -d /mnt/logs ]; then
-    /root/tboot/utils/txt-stat > /mnt/logs/log-`date +%Y%m%d%H%M%S`
+    txt-stat > /mnt/logs/log-`date +%Y%m%d%H%M%S`
 fi
 
 if [ -d /root/logs ]; then
-    /root/tboot/utils/txt-stat > /root/logs/log-`date +%Y%m%d%H%M%S`
+    txt-stat > /root/logs/log-`date +%Y%m%d%H%M%S`
 fi
 
 if [ -d /root/logs ]; then
@@ -41,7 +41,7 @@ if [ -d /root/logs ]; then
         if [ -e /root/logs/txt.log ]; then
             rm /root/logs/txt.log
         fi
-        /root/tboot/utils/txt-stat > /root/logs/txt.log
+        txt-stat > /root/logs/txt.log
         if grep 'TXT measured launch: FALSE' /root/logs/txt.log
         then
             echo "Secure S3 failed - TXT measured launch failed"

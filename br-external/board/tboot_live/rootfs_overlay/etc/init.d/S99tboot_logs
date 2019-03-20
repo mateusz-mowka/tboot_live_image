@@ -2,9 +2,9 @@
 
 case "$1" in
 	start)
-		printf "Dump tboot logs to disk"
+		printf "Dump tboot logs to disk... "
 		mkdir -p /mnt/logs
-		/root/tboot/utils/txt-stat > /mnt/logs/log-`date +%Y%m%d%H%M%S`
+		txt-stat > /mnt/logs/log-`date +%Y%m%d%H%M%S`
 		echo "done."
 		;;
 	stop)
