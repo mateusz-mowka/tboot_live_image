@@ -15,6 +15,9 @@ if [ -d /root/logs ]; then
 #    cat $PCRSFILE > /root/logs/pcrs.bk
 fi
 
+# Uncomment below line to force S3 sleep
+#echo deep > /sys/power/mem_sleep
+
 echo mem > /sys/power/state
 
 sleep 5
