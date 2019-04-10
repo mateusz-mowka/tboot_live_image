@@ -3,7 +3,7 @@
 # tboot
 #
 ################################################################################
-TBOOT_VERSION = ef0b3b4d6c3c830ef925e5eab39bc3122531b0e5
+TBOOT_VERSION = v1.9.10
 TBOOT_SITE = http://hg.code.sf.net/p/tboot/code
 TBOOT_SITE_METHOD = hg
 TBOOT_DEPENDENCIES = trousers
