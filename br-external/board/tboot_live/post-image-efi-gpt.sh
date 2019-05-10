@@ -41,7 +41,7 @@ mkdosfs -n LIVE efi-part.vfat
 mcopy -bsp -i efi-part.vfat efi-part/startup.nsh ::startup.nsh
 mcopy -bsp -i efi-part.vfat efi-part/EFI ::EFI
 mcopy -bsp -i efi-part.vfat bzImage ::bzImage
-mcopy -bsp -i efi-part.vfat rootfs.cpio.xz ::rootfs.cpio.xz
+mcopy -bsp -i efi-part.vfat rootfs.cpio.gz ::rootfs.cpio.gz
 mcopy -bsp -i efi-part.vfat tboot.gz ::tboot.gz
 
 rm -f disk.img
