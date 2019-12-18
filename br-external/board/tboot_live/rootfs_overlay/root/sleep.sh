@@ -7,7 +7,7 @@ if [ -d /root/logs ]; then
     PCRSFILE=`find /sys/ -name 'pcrs'`
     if [ "${PCRSFILE}x" == 'x' ]; then
         # tpm 2.0 case
-	tpm2_pcrlist -T device > /root/logs/pcrs.old
+	tpm2_pcrlist > /root/logs/pcrs.old
     else
         # tpm 1.2 case
         sed -n '1,17p' $PCRSFILE > /root/logs/pcrs.old
@@ -33,7 +33,7 @@ fi
 if [ -d /root/logs ]; then
     if [ "${PCRSFILE}x" == 'x' ]; then
         # tpm 2.0 case
-	tpm2_pcrlist -T device > /root/logs/pcrs.new
+	tpm2_pcrlist > /root/logs/pcrs.new
     else
         # tpm 1.2 case
         sed -n '1,17p' $PCRSFILE > /root/logs/pcrs.new
