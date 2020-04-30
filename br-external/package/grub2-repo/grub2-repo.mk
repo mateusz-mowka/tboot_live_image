@@ -3,7 +3,7 @@
 # grub2-repow
 #
 ################################################################################
-GRUB2_REPO_VERSION = 41121742df1af73699965a2aab5fb1f5e6555ad5 # currently latest version
+GRUB2_REPO_VERSION = c543d678105037afebb4fdea1fb7e423da3cb3cb # currently latest version
 GRUB2_REPO_SITE = https://git.savannah.gnu.org/git/grub.git
 GRUB2_REPO_SITE_METHOD = git
 GRUB2_REPO_LICENSE = GPL-3.0+
