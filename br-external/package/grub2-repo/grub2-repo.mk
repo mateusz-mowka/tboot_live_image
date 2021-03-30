@@ -3,7 +3,7 @@
 # grub2-repow
 #
 ################################################################################
-GRUB2_REPO_VERSION = c543d678105037afebb4fdea1fb7e423da3cb3cb # currently latest version
+GRUB2_REPO_VERSION = a53e530f8ad3770c3b03c208c08ae4162f68e3b1 # currently latest version
 GRUB2_REPO_SITE = https://git.savannah.gnu.org/git/grub.git
 GRUB2_REPO_SITE_METHOD = git
 GRUB2_REPO_LICENSE = GPL-3.0+
@@ -95,14 +95,16 @@ GRUB2_REPO_CONF_OPTS = \
 	--enable-efiemu=no \
 	ac_cv_lib_lzma_lzma_code=no \
 	--enable-device-mapper=no \
-	--enable-libzfs=no
+	--enable-libzfs=no \
+	--disable-werror
 
 HOST_GRUB2_REPO_CONF_OPTS = \
 	--disable-grub-mkfont \
 	--enable-efiemu=no \
 	ac_cv_lib_lzma_lzma_code=no \
 	--enable-device-mapper=no \
-	--enable-libzfs=no
+	--enable-libzfs=no \
+	--disable-werror
 
 define GRUB2_REPO_RUN_BOOTSTRAP
 	(cd $(@D); \
