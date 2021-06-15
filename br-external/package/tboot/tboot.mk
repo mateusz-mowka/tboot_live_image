@@ -3,10 +3,10 @@
 # tboot
 #
 ################################################################################
-TBOOT_VERSION = v1.10.1
+TBOOT_VERSION = v1.10.2
 TBOOT_SITE = http://hg.code.sf.net/p/tboot/code
 TBOOT_SITE_METHOD = hg
-TBOOT_DEPENDENCIES = trousers
+TBOOT_DEPENDENCIES = openssl
 TBOOT_INSTALL_IMAGES = YES
 TBOOT_INSTALL_TARGET = YES
 
