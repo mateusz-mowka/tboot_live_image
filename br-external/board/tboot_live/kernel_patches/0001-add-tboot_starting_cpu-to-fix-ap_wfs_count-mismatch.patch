@@ -1,0 +1,70 @@
+From 446cd94590143e2b7418ffcd3bf1c76beee69f9c Mon Sep 17 00:00:00 2001
+From: "Randzio, Pawel" <pawel.randzio@intel.com>
+Date: Tue, 9 Aug 2022 13:15:23 +0200
+Subject: [PATCH] add tboot_starting_cpu to fix ap_wfs_count mismatch
+
+tboot->num_in_wfs is # of CPUs in WFS, kernel's tboot driver will
+only increase the count in tboot_dying_cpu, so it'll cause a mis-
+match between kernel and tboot.
+
+This fix adds tboot_starting_cpu() function to align logic on both
+sides.
+
+Signed-off-by: Randzio, Pawel <pawel.randzio@intel.com>
+---
+ arch/x86/kernel/tboot.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kernel/tboot.c b/arch/x86/kernel/tboot.c
+index 3bacd935f840..ff3d0e9993fc 100644
+--- a/arch/x86/kernel/tboot.c
++++ b/arch/x86/kernel/tboot.c
+@@ -328,19 +328,32 @@ static int tboot_wait_for_aps(int num_aps)
+ 		timeout--;
+ 	}
+ 
+-	if (timeout)
++	if (!timeout)
+ 		pr_warn("tboot wait for APs timeout\n");
+ 
+ 	return !(atomic_read((atomic_t *)&tboot->num_in_wfs) == num_aps);
+ }
+ 
++static int tboot_starting_cpu(unsigned int cpu)
++{
++	if (num_online_cpus() == 1) {
++		tboot_wait_for_aps(atomic_read(&ap_wfs_count));
++	} else {
++		atomic_dec(&ap_wfs_count);
++	}
++
++	return 0;
++}
++
+ static int tboot_dying_cpu(unsigned int cpu)
+ {
+-	atomic_inc(&ap_wfs_count);
+ 	if (num_online_cpus() == 1) {
+ 		if (tboot_wait_for_aps(atomic_read(&ap_wfs_count)))
+ 			return -EBUSY;
++	} else {
++		atomic_inc(&ap_wfs_count);
+ 	}
++
+ 	return 0;
+ }
+ 
+@@ -418,8 +431,8 @@ static __init int tboot_late_init(void)
+ 
+ 	tboot_create_trampoline();
+ 
+-	atomic_set(&ap_wfs_count, 0);
+-	cpuhp_setup_state(CPUHP_AP_X86_TBOOT_DYING, "x86/tboot:dying", NULL,
++	atomic_set(&ap_wfs_count, num_online_cpus());
++	cpuhp_setup_state(CPUHP_AP_X86_TBOOT_DYING, "x86/tboot:dying", tboot_starting_cpu,
+ 			  tboot_dying_cpu);
+ #ifdef CONFIG_DEBUG_FS
+ 	debugfs_create_file("tboot_log", S_IRUSR,
+-- 
+2.25.1
+
