@@ -3,7 +3,7 @@
 # tboot
 #
 ################################################################################
-TBOOT_VERSION = v1.11.0
+TBOOT_VERSION = v1.11.1
 TBOOT_SITE = http://hg.code.sf.net/p/tboot/code
 TBOOT_SITE_METHOD = hg
 TBOOT_DEPENDENCIES = openssl
