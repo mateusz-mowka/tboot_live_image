@@ -1,0 +1,37 @@
+From d9d5de693a26e684d513ae29c8042f74ce653a67 Mon Sep 17 00:00:00 2001
+From: Mark Gross <mgross@linux.intel.com>
+Date: Wed, 24 May 2023 12:22:44 -0700
+Subject: [PATCH] Disable CET when calling tboot->shutdown_entry passed in from
+ tboot boot parrameters.
+
+The tboot->shutdown_entry is effectively bios code and CET needs to be
+disabled before calling it.
+
+Signed-off-by: Mark Gross <mark.gross@intel.com>
+---
+ arch/x86/kernel/tboot.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/x86/kernel/tboot.c b/arch/x86/kernel/tboot.c
+index 4c1bcb6053fc0..932c2c44e743d 100644
+--- a/arch/x86/kernel/tboot.c
++++ b/arch/x86/kernel/tboot.c
+@@ -28,6 +28,7 @@
+ #include <asm/setup.h>
+ #include <asm/e820/api.h>
+ #include <asm/io.h>
++#include <asm/cpu.h>
+ 
+ #include "../realmode/rm/wakeup.h"
+ 
+@@ -248,6 +249,10 @@ void tboot_shutdown(u32 shutdown_type)
+ 
+ 	switch_to_tboot_pt();
+ 
++	/*
++	 * toggle off CET while we call shutdown_entry in bios
++	 */
++	cet_disable();
+ 	shutdown = (void(*)(void))(unsigned long)tboot->shutdown_entry;
+ 	shutdown();
+ 
