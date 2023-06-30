@@ -64,14 +64,30 @@ make BR2_EXTERNAL=$PWD/br-external -C buildroot O=$PWD/build linux-savedefconfig
 cp build/build/linux-4.19.25/defconfig br-external/board/tboot_live/linux.config
 ```
 
+Project branches
+================
+
+Starting with version 3.9.2 there is a new branch introduced that uses intel-next kernel in favor of the mainline kernel. The branch name is live-iamge-intel-next.
+This is intended for internal use only. The rationale behind it is that future platforms often lack support in currect kernel which leads to issue in validation efforts.
+
+It has been proven that using intel-next kernel solves multiple issues regarding S3 cycles and problems with graphic card support.
+
+Note: intel-next is intended for internal Intel use and must not be shared outside of Intel.
+
+More information on intel-next kernel is available at:
+
+https://github.com/intel-innersource/os.linux.intelnext.kernel
+https://intelpedia.intel.com/IntelNext
+
 Live Image versioning schema
 ============================
 
-Live Image version number consists of three digits separated by dots: x.y.z 
+Live Image version number consists of three digits separated by dots: x.y.z
 
 Version should be incremented in the following way:
 - **x** - Linux distribution change, like from Fedora to Buildroot
 - **y** - Linux distribution update, ex. new Buildroot release or mass packages update
 - **z** - changes in packages configuration, packages version, configuration files
 
-Historically there were two major TBOOT Live Image releases, first based on Ubuntu, second on Fedora. That's why Buildroot based release starts with 3.0.0 version.
+Live image releases that use intel-next kernel should include kernel version:
+x.y.z_intel-next_<version> e.g. 3.9.2_intel-next_intel-6.4-2023-06-29
