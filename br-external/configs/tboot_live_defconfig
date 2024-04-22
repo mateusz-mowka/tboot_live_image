@@ -12,6 +12,7 @@ BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/rootfs_overlay"
 BR2_ROOTFS_POST_FAKEROOT_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/target_customization.sh"
 BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/post-image-efi-gpt.sh"
+BR2_ROOTFS_PRE_BUILD_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/package/change_link/change_link.sh"
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
