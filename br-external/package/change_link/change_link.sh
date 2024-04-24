@@ -8,6 +8,7 @@ linux_firmware_next_proper_filename="linux-firmware-next"
 path_to_dl_linux_firmware_next=$path_to_dl_linux_firmware_next_parent"/"$linux_firmware_next_filename
 path_to_tar=$path_to_dl_linux_firmware/linux-firmware-next.tar.xz
 path_to_hash="package/linux-firmware/linux-firmware.hash"
+path_to_post_image_efi_gpt="../br-external/board/tboot_live/post-image-efi-gpt.sh"
 
 checkFirmwareNextExist()
 {
@@ -41,6 +42,12 @@ checkFirmwareNextExist()
 
     if [ ! -f $path_to_hash ]; then
         echo "Error! File "$path_to_hash" does not exist. Skip..."
+        exit 0
+    fi
+
+    if [ ! -f $path_to_post_image_efi_gpt ]; then
+        echo "Error! File "$path_to_post_image_efi_gpt" does not exist. Skip..."
+        exit 0
     fi
 }
 
@@ -131,7 +138,16 @@ updateHash()
     updateHashLicense
 }
 
+updateSizeOfImg()
+{
+    line=$(grep 'efi_part_size=$(( 104857600 / 512 )) # 100MB' $path_to_post_image_efi_gpt)
+    output='efi_part_size=$(( 536870912 / 512 )) # 512MB'
+
+    sed -i "s|$line|$output|" $path_to_post_image_efi_gpt
+}
+
 checkFirmwareNextExist
 makeTar
 updateMakefile
 updateHash
+updateSizeOfImg
