@@ -33,7 +33,7 @@ validate_condtitions()
         echo $PATH_TO_LINUX_FIRMWARE_NEXT' does not exist. Skip introduction linux-firmware-next.'
         exit 0
     else
-        echo $PATH_TO_DL_LINUX_FIRMWARE' exist. Firmware next can be copied to build folder'
+        echo "Directory with firmare next: '"$PATH_TO_DL_LINUX_FIRMWARE"' exist. Firmware next can be copied to build folder"
     fi
 
     # Check if the linux-firmware.hash file exists, if not, skip current script execution
@@ -65,7 +65,10 @@ update_makefile()
     line=$(grep 'LINUX_FIRMWARE_VERSION =' package/linux-firmware/linux-firmware.mk)
     output="LINUX_FIRMWARE_VERSION = next"
 
-    sed -i "s|$line|$output|" package/linux-firmware/linux-firmware.mk
+    if [ "$line" != "$output" ]; then
+        echo "Update version linux firmware to next"
+        sed -i "s|$line|$output|" package/linux-firmware/linux-firmware.mk
+    fi
 }
 
 # Update hash file (linux-firmware.hash):
@@ -73,18 +76,28 @@ update_makefile()
 #    arg $2: string in the hash file that should be replaced 
 update_hash_file()
 {
-    line=$(grep $2 $PATH_TO_HASH)
+    # find only line where phrase ending the line
+    line=$(awk -v phrase=$2 '$0 ~ phrase "$"' $PATH_TO_HASH)
     sha256="$(sha256sum $1 | cut -d' ' -f1)"
-    filename=$(basename $1)
-    echo "sha256 " $sha256 " " $filename
+    output="sha256  "$sha256"  "$2
 
-    output="sha256 "$sha256" "$filename
-    sed -i "s|$line|$output|" $PATH_TO_HASH  
+    if [ "$line" != "$output" ]; then
+        echo "line: '"$line"' update to: '"$output"'"
+        sed -i "s|$line|$output|" $PATH_TO_HASH
+    fi
 }
 
 update_hash_tar()
 {
-    update_hash_file $PATH_TO_TAR "linux-firmware-"
+    line=$(grep "linux-firmware-" $PATH_TO_HASH)
+    sha256="$(sha256sum $PATH_TO_TAR | cut -d' ' -f1)"
+    filename=$(basename $PATH_TO_TAR)
+    output="sha256  "$sha256"  "$filename
+
+    if [ "$line" != "$output" ]; then
+        echo "line: '"$line"' update to: '"$output"'"
+        sed -i "s|$line|$output|" $PATH_TO_HASH
+    fi
 }
 
 update_hash_license()
@@ -145,7 +158,10 @@ update_size_of_img()
     line=$(grep 'efi_part_size=' $PATH_TO_POST_IMAGE_EFI_GPT)
     output='efi_part_size=$(( 536870912 / 512 )) # 512MB'
 
-    sed -i "s|$line|$output|" $PATH_TO_POST_IMAGE_EFI_GPT
+    if [ "$line" != "$output" ]; then
+        echo "Update size od disk.img to 512MB"
+        sed -i "s|$line|$output|" $PATH_TO_POST_IMAGE_EFI_GPT
+    fi
 }
 
 validate_condtitions
