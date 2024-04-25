@@ -1,66 +1,66 @@
 #!/bin/sh
 
-path_to_dl="dl"
-path_to_dl_linux_firmware=$path_to_dl"/linux-firmware"
-path_to_dl_linux_firmware_next_parent=$path_to_dl_linux_firmware
-linux_firmware_next_filename="os.linux.intelnext.firmware"
-linux_firmware_next_proper_filename="linux-firmware-next"
-path_to_dl_linux_firmware_next=$path_to_dl_linux_firmware_next_parent"/"$linux_firmware_next_filename
-path_to_tar=$path_to_dl_linux_firmware/linux-firmware-next.tar.xz
-path_to_hash="package/linux-firmware/linux-firmware.hash"
-path_to_post_image_efi_gpt="../br-external/board/tboot_live/post-image-efi-gpt.sh"
+PATH_TO_DL="dl"
+PATH_TO_DL_LINUX_FIRMWARE=$PATH_TO_DL"/linux-firmware"
+LINUX_FIRMWARE_NEXT_PROPER_FILENAME="linux-firmware-next"
+PATH_TO_TAR=$PATH_TO_DL_LINUX_FIRMWARE/linux-firmware-next.tar.xz
+PATH_TO_HASH="package/linux-firmware/linux-firmware.hash"
+PATH_TO_POST_IMAGE_EFI_GPT="../br-external/board/tboot_live/post-image-efi-gpt.sh"
 
-checkFirmwareNextExist()
+# These variables may be changed, depending on where the linux-firmware-next folder was downloaded
+LINUX_FIRMWARE_NEXT_FILENAME="os.linux.intelnext.firmware"
+PATH_TO_LINUX_FIRMWARE_NEXT_PARENT=$PATH_TO_DL_LINUX_FIRMWARE
+PATH_TO_LINUX_FIRMWARE_NEXT=$PATH_TO_LINUX_FIRMWARE_NEXT_PARENT"/"$LINUX_FIRMWARE_NEXT_FILENAME
+
+# Validate conditions to perform current script (if the conditions are not met, skip script execution):
+#    direcory with linux-firmare-next must exit, and be pointed at path $PATH_TO_LINUX_FIRMWARE_NEXT
+#    hash file (linux-firmware.hash) must exist and be located under the path $PATH_TO_HASH (required to calculate new hashes)
+#    post-image-efi-gpt.sh must exist and be located under the path $PATH_TO_POST_IMAGE_EFI_GPT (required to increase disk.img size)
+validate_condtitions()
 {
-    # pwd
-    # echo "patch to dl=" $path_to_dl
-
-    if [ ! -d $path_to_dl ]; then
-        echo $path_to_dl' does not exist.'
-        mkdir $path_to_dl
-    else
-        echo $path_to_dl' exist.'
+    # Creates folders where linux-firmware-next.tar.xz will be placed
+    if [ ! -d $PATH_TO_DL ]; then
+        echo $PATH_TO_DL' does not exist.'
+        mkdir $PATH_TO_DL
     fi
 
-    # echo "patch to dl linux firmware=" $path_to_dl_linux_firmware
-
-    if [ ! -d $path_to_dl_linux_firmware ]; then
-        echo $path_to_dl_linux_firmware' does not exist.'
-        mkdir $path_to_dl_linux_firmware
-    else
-        echo $path_to_dl_linux_firmware' exist.'
+    if [ ! -d $PATH_TO_DL_LINUX_FIRMWARE ]; then
+        echo $PATH_TO_DL_LINUX_FIRMWARE' does not exist.'
+        mkdir $PATH_TO_DL_LINUX_FIRMWARE
     fi
 
-    # echo "patch to dl linux firmware next=" $path_to_dl_linux_firmware_next
-
-    if [ ! -d $path_to_dl_linux_firmware_next ]; then
-        echo $path_to_dl_linux_firmware_next' does not exist. Skip...'
+    if [ ! -d $PATH_TO_LINUX_FIRMWARE_NEXT ]; then
+        echo $PATH_TO_LINUX_FIRMWARE_NEXT' does not exist. Skip introduction linux-firmware-next.'
         exit 0
     else
-        echo $path_to_dl_linux_firmware' exist. Firmware next can be copied to build folder'
+        echo $PATH_TO_DL_LINUX_FIRMWARE' exist. Firmware next can be copied to build folder'
     fi
 
-    if [ ! -f $path_to_hash ]; then
-        echo "Error! File "$path_to_hash" does not exist. Skip..."
+    # Check if the linux-firmware.hash file exists, if not, skip current script execution
+    if [ ! -f $PATH_TO_HASH ]; then
+        echo "Error! File "$PATH_TO_HASH" does not exist. Skip introduction linux-firmware-next."
         exit 0
     fi
 
-    if [ ! -f $path_to_post_image_efi_gpt ]; then
-        echo "Error! File "$path_to_post_image_efi_gpt" does not exist. Skip..."
+    # Check if the post-image-efi-gpt.sh file exists, if not, skip current script execution
+    if [ ! -f $PATH_TO_POST_IMAGE_EFI_GPT ]; then
+        echo "Error! File "$PATH_TO_POST_IMAGE_EFI_GPT" does not exist. Skip introduction linux-firmware-next."
         exit 0
     fi
 }
 
-makeTar()
+# Create .tar file (linux-firmware-next.tar.xz) based on directory with linux-firmware-next
+make_tar()
 {
-    if [ ! -f $path_to_tar ]; then
-        echo $path_to_tar' does not exist.'
-        echo "tar cJf "$path_to_dl_linux_firmware/linux-firmware-next.tar.xz $path_to_dl_linux_firmware_next "(this may take a while)"
-        tar -C $path_to_dl_linux_firmware_next_parent  --transform="s/$linux_firmware_next_filename/$linux_firmware_next_proper_filename/" -cJf $path_to_tar $linux_firmware_next_filename --checkpoint=.100
+    if [ ! -f $PATH_TO_TAR ]; then
+        echo $PATH_TO_TAR' does not exist. Need to be created.'
+        echo "tar cJf "$PATH_TO_DL_LINUX_FIRMWARE/linux-firmware-next.tar.xz $PATH_TO_LINUX_FIRMWARE_NEXT "(this operation may take a while)"
+        tar -C $PATH_TO_LINUX_FIRMWARE_NEXT_PARENT  --transform="s/$LINUX_FIRMWARE_NEXT_FILENAME/$LINUX_FIRMWARE_NEXT_PROPER_FILENAME/" -cJf $PATH_TO_TAR $LINUX_FIRMWARE_NEXT_FILENAME --checkpoint=.100
     fi
 }
 
-updateMakefile()
+# Update makefile linux_firmware.mk to change version (on version with linux firmware next)
+update_makefile()
 {
     line=$(grep 'LINUX_FIRMWARE_VERSION =' package/linux-firmware/linux-firmware.mk)
     output="LINUX_FIRMWARE_VERSION = next"
@@ -68,26 +68,27 @@ updateMakefile()
     sed -i "s|$line|$output|" package/linux-firmware/linux-firmware.mk
 }
 
-updateHshFile()
+# Update hash file (linux-firmware.hash):
+#    arg $1: file based on which the hash is calculated
+#    arg $2: string in the hash file that should be replaced 
+update_hash_file()
 {
-    line=$(grep $2 $path_to_hash)
+    line=$(grep $2 $PATH_TO_HASH)
     sha256="$(sha256sum $1 | cut -d' ' -f1)"
     filename=$(basename $1)
     echo "sha256 " $sha256 " " $filename
 
     output="sha256 "$sha256" "$filename
-    sed -i "s|$line|$output|" $path_to_hash  
+    sed -i "s|$line|$output|" $PATH_TO_HASH  
 }
 
-updateHashTar()
+update_hash_tar()
 {
-    echo "Update Tar Hash"
-    updateHshFile $path_to_tar "linux-firmware-"
+    update_hash_file $PATH_TO_TAR "linux-firmware-"
 }
 
-updateHashLicense()
+update_hash_license()
 {
-    echo "Update License Hash"
     tab=(
         "LICENCE.Abilis"
         "LICENSE.amdgpu"
@@ -128,26 +129,27 @@ updateHashLicense()
     );
 
     for element in "${tab[@]}"; do
-        updateHshFile $path_to_dl_linux_firmware_next"/"$element $element
+        update_hash_file $PATH_TO_LINUX_FIRMWARE_NEXT"/"$element $element
     done
 }
 
-updateHash()
+update_hash()
 {
-    updateHashTar
-    updateHashLicense
+    update_hash_tar
+    update_hash_license
 }
 
-updateSizeOfImg()
+# Filesystem based on linux-firmware-next (rootfs.cpio.gz) is to big to fit in disk.img (100MB). Size od disk.img must be increased (512MB) 
+update_size_of_img()
 {
-    line=$(grep 'efi_part_size=$(( 104857600 / 512 )) # 100MB' $path_to_post_image_efi_gpt)
+    line=$(grep 'efi_part_size=' $PATH_TO_POST_IMAGE_EFI_GPT)
     output='efi_part_size=$(( 536870912 / 512 )) # 512MB'
 
-    sed -i "s|$line|$output|" $path_to_post_image_efi_gpt
+    sed -i "s|$line|$output|" $PATH_TO_POST_IMAGE_EFI_GPT
 }
 
-checkFirmwareNextExist
-makeTar
-updateMakefile
-updateHash
-updateSizeOfImg
+validate_condtitions
+make_tar
+update_makefile
+update_hash
+update_size_of_img
