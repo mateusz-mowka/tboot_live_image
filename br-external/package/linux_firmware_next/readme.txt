@@ -9,5 +9,5 @@ How to use:
         PATH_TO_LINUX_FIRMWARE_NEXT -> path to linux-firmare-next (default: tboot_live_image/buildroot/dl/linux-firmware/os.linux.intelnext.firmware)
 
     To download linux-firmware-next use command: git clone https://github.com/intel-innersource/os.linux.intelnext.firmware
-2. To update buildroot congig use command: make BR2_EXTERNAL=$PWD/br-external -C buildroot O=$PWD/build tboot_live_defconfig
+2. To update buildroot config use command: make BR2_EXTERNAL=$PWD/br-external -C buildroot O=$PWD/build tboot_live_defconfig
 3. Compile. Size of disk.img should be 512MB
