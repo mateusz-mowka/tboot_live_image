@@ -102,44 +102,42 @@ update_hash_tar()
 
 update_hash_license()
 {
-    tab=( /
-        "LICENCE.Abilis" /
-        "LICENSE.amdgpu" /
-        "LICENCE.Marvell" /
-        "LICENCE.atheros_firmware" /
-        "ath10k/QCA6174/hw3.0/notice_ath10k_firmware-4.txt" /
-        "ath10k/QCA6174/hw2.1/notice_ath10k_firmware-5.txt" /
-        "ath10k/QCA6174/hw3.0/notice_ath10k_firmware-6.txt" /
-        "LICENCE.broadcom_bcm43xx" /
-        "LICENCE.chelsio_firmware" /
-        "LICENCE.cypress" /
-        "LICENCE.fw_sst_0f28" /
-        "LICENCE.ibt_firmware" /
-        "LICENSE.ice_enhanced" /
-        "LICENCE.it913x" /
-        "LICENCE.iwlwifi_firmware" /
-        "LICENCE.microchip" /
-        "LICENCE.moxa" /
-        "LICENCE.qat_firmware" /
-        "LICENCE.qla2xxx" /
-        "LICENCE.ralink-firmware.txt" /
-        "LICENCE.ralink_a_mediatek_company_firmware" /
-        "LICENCE.rtlwifi_firmware.txt" /
-        "LICENCE.ti-connectivity" /
-        "LICENCE.xc4000" /
-        "LICENCE.xc5000" /
-        "LICENCE.xc5000c" /
-        "LICENSE.QualcommAtheros_ar3k" /
-        "LICENSE.QualcommAtheros_ath10k" /
-        "LICENSE.dib0700" /
-        "LICENSE.i915" /
-        "LICENSE.qcom" /
-        "LICENSE.radeon" /
-        "LICENSE.sdma_firmware" /
-        "WHENCE" /
-        "qcom/NOTICE.txt" /
-        "LICENCE.e100" /
-    );
+    tab[0]="LICENCE.Abilis"
+    tab[1]="LICENSE.amdgpu"
+    tab[2]="LICENCE.Marvell"
+    tab[3]="LICENCE.atheros_firmware"
+    tab[4]="ath10k/QCA6174/hw3.0/notice_ath10k_firmware-4.txt"
+    tab[5]="ath10k/QCA6174/hw2.1/notice_ath10k_firmware-5.txt"
+    tab[6]="ath10k/QCA6174/hw3.0/notice_ath10k_firmware-6.txt"
+    tab[7]="LICENCE.broadcom_bcm43xx"
+    tab[8]="LICENCE.chelsio_firmware"
+    tab[9]="LICENCE.cypress"
+    tab[10]="LICENCE.fw_sst_0f28"
+    tab[11]="LICENCE.ibt_firmware"
+    tab[12]="LICENSE.ice_enhanced"
+    tab[13]="LICENCE.it913x"
+    tab[14]="LICENCE.iwlwifi_firmware"
+    tab[15]="LICENCE.microchip"
+    tab[16]="LICENCE.moxa"
+    tab[17]="LICENCE.qat_firmware"
+    tab[18]="LICENCE.qla2xxx"
+    tab[19]="LICENCE.ralink-firmware.txt"
+    tab[20]="LICENCE.ralink_a_mediatek_company_firmware"
+    tab[21]="LICENCE.rtlwifi_firmware.txt"
+    tab[22]="LICENCE.ti-connectivity"
+    tab[23]="LICENCE.xc4000"
+    tab[24]="LICENCE.xc5000"
+    tab[25]="LICENCE.xc5000c"
+    tab[26]="LICENSE.QualcommAtheros_ar3k"
+    tab[27]="LICENSE.QualcommAtheros_ath10k"
+    tab[28]="LICENSE.dib0700"
+    tab[29]="LICENSE.i915"
+    tab[30]="LICENSE.qcom"
+    tab[31]="LICENSE.radeon"
+    tab[32]="LICENSE.sdma_firmware"
+    tab[33]="WHENCE"
+    tab[34]="qcom/NOTICE.txt"
+    tab[35]="LICENCE.e100"
 
     for element in "${tab[@]}"; do
         update_hash_file $PATH_TO_LINUX_FIRMWARE_NEXT"/"$element $element
