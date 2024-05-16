@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PATH_TO_DL="dl"
 PATH_TO_DL_LINUX_FIRMWARE=$PATH_TO_DL"/linux-firmware"
