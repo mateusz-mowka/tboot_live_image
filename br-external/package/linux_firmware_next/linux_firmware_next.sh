@@ -31,7 +31,7 @@ validate_condtitions()
 
     if [ ! -d $PATH_TO_LINUX_FIRMWARE_NEXT ]; then
         echo $PATH_TO_LINUX_FIRMWARE_NEXT' does not exist. Skip introduction linux-firmware-next.'
-        exit 0
+        git clone https://github.com/intel-innersource/os.linux.intelnext.firmware $PATH_TO_LINUX_FIRMWARE_NEXT
     else
         echo "Directory with firmare next: '"$PATH_TO_DL_LINUX_FIRMWARE"' exist. Firmware next can be copied to build folder"
     fi
