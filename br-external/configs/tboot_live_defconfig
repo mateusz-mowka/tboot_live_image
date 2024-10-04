@@ -1,4 +1,5 @@
 BR2_x86_64=y
+BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_6_7=y
 BR2_GCC_VERSION_12_X=y
 BR2_TOOLCHAIN_BUILDROOT_CXX=y
 # BR2_PIC_PIE is not set
@@ -10,9 +11,9 @@ BR2_TARGET_GENERIC_ISSUE="Welcome to TBOOT Live Image"
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
 BR2_TARGET_GENERIC_GETTY_PORT="tty1"
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/rootfs_overlay"
+BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/package/linux_firmware_next/linux_firmware_next.sh"
 BR2_ROOTFS_POST_FAKEROOT_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/target_customization.sh"
 BR2_ROOTFS_POST_IMAGE_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/board/tboot_live/post-image-efi-gpt.sh"
-BR2_ROOTFS_POST_BUILD_SCRIPT="$(BR2_EXTERNAL_TBOOT_LIVE_PATH)/package/linux_firmware_next/linux_firmware_next.sh"
 BR2_LINUX_KERNEL=y
 BR2_LINUX_KERNEL_CUSTOM_GIT=y
 BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/intel-innersource/os.linux.intelnext.kernel.git"
