@@ -1,0 +1,89 @@
+v3.1.1
+  * enable x2apic support in kernel
+
+v3.2.0
+  * bump buildboot version (including tpm2-tools v4.1.1)
+  * kernel 5.6.15
+  * add Python 3
+  * add ssh server
+
+v3.3.0
+  * buildroot 2020.11
+  * TBOOT 1.10.0
+  * kernel 5.9.11
+  * add 'noefi' flag to kernel parameters
+
+v3.4.0
+  * buildroot 2021.02
+  * TBOOT 1.10.1
+  * kernel 5.12-rc4
+  * patches for CML GFX driver
+  * add 'no_console_suspend=1' flag to kernel parameters
+
+v3.5.0
+  * buildroot 2021.05
+  * TBOOT 1.10.2
+  * kernel 5.12.4
+
+v3.6.0
+  * buildroot 2021.11
+  * TBOOT 1.10.3
+  * kernel 5.15.6
+
+v3.6.1
+  * TBOOT 1.10.5
+  * kernel drm-tip-5.17
+  * fixed display issues
+
+v3.6.2
+ * fixed S5 flow
+
+v3.6.3
+ * kernel v5.18
+ * fixed S3 flow (for client, might now be broken for server)
+
+v3.7.0
+ * buildroot 2022.8
+ * patch for S3 (proved to work for client platform, untested for server)
+ * known issue: might fail to perform secure S3 with PTT
+
+v3.8.0
+ * TBOOT 1.11.0 - fixed PTT issue
+ * buildroot 2022.11
+ * kernel 6.1
+
+v3.8.1
+ * TBOOT 1.11.1 - reverted memory log range extension (caused boot failures)
+ 
+v3.9.0
+ * TBOOT 1.11.1 - no change
+ * kernel 6.3
+ * buildroot 2023.05
+
+v3.9.1
+  * TBOOT 1.11.2
+
+v3.9.2
+  * Install i915 firmware for Intel GPUs
+  * Add a patch to disable CET before calling tboot_shutdown
+
+v3.9.3
+  * Kernel 6.6.2
+  * buildroot 2023.11-rc1
+
+v3.9.4
+  * TBOOT 1.11.3
+
+v3.9.5
+  * TBOOT 1.11.4
+
+v3.9.6
+  * TBOOT 1.11.7
+  * Kernel 6.7
+  * Buildroot 2024.08
+
+v3.9.7
+  * TBOOT 1.11.9
+
+v3.9.8
+  * Intel TXT Protected Ranges support added
