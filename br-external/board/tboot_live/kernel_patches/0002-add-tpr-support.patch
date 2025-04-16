@@ -111,11 +111,11 @@ index 3764f28ece15..ac3cc30490d7 100644
 +	for (i = 0; i < *instance_cnt; ++i) {
 +		for (j = 0; j < tpr_inst->tpr_cnt; ++j) {
 +			uint64_t *base = ioremap(tpr_inst->tpr_array[j].base, 16);
-+			printk("TPR instance %d, TPR %d:base %llx limit %llx\n", i, j, readl(base), readl(base + 1));
++			printk("TPR instance %d, TPR %d:base %llx limit %llx\n", i, j, readq(base), readq(base + 1));
 +			*base |= (1 << 4);
 +			iounmap(base);
 +		}
-+		tpr_inst += sizeof(*tpr_inst) + j*sizeof(*(tpr_inst->tpr_array));
++		tpr_inst = (struct acpi_dtpr_instance *)((u8*)tpr_inst + sizeof(*tpr_inst) + j*sizeof(*(tpr_inst->tpr_array)));
 +	}
 +	if (tboot_tpr_enabled)
 +		pr_debug("TPR protection detected, PMR will be disabled\n");
