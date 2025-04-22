@@ -87,3 +87,7 @@ v3.9.7
 
 v3.9.8
   * Intel TXT Protected Ranges support added
+
+v3.9.9
+  * Bug in TPR support causing the overflow when there was more than 1 tpr instance present fixed
+  * TBOOT 1.11.10
