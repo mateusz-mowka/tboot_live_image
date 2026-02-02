@@ -1,0 +1,13 @@
+diff --git a/drivers/thermal/intel/therm_throt.c b/drivers/thermal/intel/therm_throt.c
+index a1aa0f8b00f1..ad58bb1eb060 100644
+--- a/drivers/thermal/intel/therm_throt.c
++++ b/drivers/thermal/intel/therm_throt.c
+@@ -540,7 +540,7 @@ static void thermal_throttle_remove_dev(struct device *dev)
+  * interrupt in CPUs of the SoC die. These CPUs are not connected to the L3
+  * cache.
+  */
+-static cpumask_t *directed_pkg_intr_cpumask;
++static cpumask_var_t directed_pkg_intr_cpumask;
+ 
+ static bool can_handle_directed_thermal_interrupt(unsigned int cpu)
+ {
