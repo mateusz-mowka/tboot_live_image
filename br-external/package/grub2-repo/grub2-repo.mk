@@ -74,7 +74,9 @@ endif
 # use the cross compile variant to ensure grub2 builds
 
 HOST_GRUB2_REPO_CONF_ENV = \
-	CPP="$(HOSTCC) -E"
+	CPP="$(HOSTCC) -E" \
+	CFLAGS="$(HOST_CFLAGS) -std=gnu17" \
+	HOST_CFLAGS="$(HOST_CFLAGS) -std=gnu17"
 
 GRUB2_REPO_CONF_ENV = \
 	CPP="$(TARGET_CC) -E" \
