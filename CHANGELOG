@@ -91,3 +91,10 @@ v3.9.8
 v3.9.9
   * Bug in TPR support causing the overflow when there was more than 1 tpr instance present fixed
   * TBOOT 1.11.10
+
+v4.0.0
+  * Update Buildroot to version 2026.02.01
+  * Eliminate Buildroot compilation errors for GCC 15 compiler
+  * Update TBOOT to v1.11.12
+  * Create Kernel patch, which disables TPRs, prior to the S3 resume execution
+    (0003-iommu-vt-d-cache-TPR-mappings-at-boot-to-fix-S3-res.patch)
