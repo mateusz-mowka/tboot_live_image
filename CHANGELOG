@@ -94,3 +94,15 @@ v3.9.9_intel-next_intel-6.7-2024-01-19
   * v3.9.8 skip to align with master
   * Bug in TPR support causing the overflow when there was more than 1 tpr instance present fixed
   * TBOOT 1.11.10
+
+v3.9.10_intel-next-6.18-2025-12-12
+  * Kernel intel-6.18-2025-12-12
+  * Removed TPR support patch (now present in intel-next intel-6.18-2025-12-12)
+  * Added patch fixing compilation issue with therm_throt.c
+  * Buildroot 2025.11.1
+
+v3.10.0_intel-next-6.18-2025-12-12
+  * TBOOT 1.11.12
+  * Buildroot 2026.02.1
+  * Fixed compilation errors for GCC 15
+  * Added Kernel patch disabling TPRs prior to S3 resume
