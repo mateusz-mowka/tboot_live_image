@@ -3,8 +3,7 @@
 FIRMWARE_PATH="os.linux.intelnext.firmware/"
 TARGET_PATH="../build/target/lib/firmware"
 
-SRC_DIR="${FIRMWARE_PATH}i915"
-
+BLOB_DIRS=("${FIRMWARE_PATH}i915" "${FIRMWARE_PATH}xe")
 
 # Remove old i915 files from live image
 rm -rf $TARGET_PATH
@@ -14,13 +13,11 @@ mkdir -p $TARGET_PATH
 git clone --filter=blob:none --no-checkout https://github.com/intel-innersource/os.linux.intelnext.firmware
 
 # Set git to download only i915 folder
-git -C $FIRMWARE_PATH sparse-checkout set --no-cone /i915 '!*/i915'
+git -C $FIRMWARE_PATH sparse-checkout set --no-cone /i915 '!*/i915' /xe '!*/xe'
 git -C $FIRMWARE_PATH checkout master
 
 # List of prefixes to search for
-prefixes=("adlp_guc" "bxt_guc" "cml_guc" "dg1_guc" "dg1_huc" "dg2_guc" "ehl_guc" "glk_guc" "icl_guc" "kbl_guc" "mtl_gsc" "mtl_guc" "pvc_guc")
-
-cd ${SRC_DIR}
+prefixes=("adlp_guc" "bxt_guc" "cml_guc" "dg1_guc" "dg1_huc" "dg2_guc" "ehl_guc" "glk_guc" "icl_guc" "kbl_guc" "mtl_gsc" "mtl_guc" "ptl_guc" "pvc_guc")
 
 # Function to compare two version strings X.Y.Z
 compare_versions() {
@@ -46,53 +43,64 @@ compare_versions() {
     return 0  # Versions are equal
 }
 
-# Loop through each prefix
-for prefix in "${prefixes[@]}"; do
-    echo "Processing files for prefix: $prefix"
-    
-    # Find all files with the current prefix
-    files=($(ls ${prefix}_*.bin 2>/dev/null))
+find_newest_version() {
+    # Loop through each prefix
+    for prefix in "${prefixes[@]}"; do
+        echo "Processing files for prefix: $prefix"
 
-    if [[ ${#files[@]} -eq 0 ]]; then
-        echo "No files found for prefix: $prefix"
+        # Find all files with the current prefix
+        files=($(ls ${prefix}_*.bin 2>/dev/null))
+
+        if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No files found for prefix: $prefix"
+            continue
+        fi
+
+        # Variable to hold the highest version file
+        highest_version_file=""
+        highest_version=""
+
+        # Loop through files to determine the highest version
+        for file in "${files[@]}"; do
+            version=$(echo "$file" | sed -r "s/^${prefix}_([0-9]+\.[0-9]+\.[0-9]+)\.bin$/\1/")
+
+            if [[ -z $highest_version ]]; then
+                highest_version=$version
+                highest_version_file=$file
+            else
+                compare_versions "$version" "$highest_version"
+                result=$?
+                if [[ $result -eq 1 ]]; then
+                    highest_version=$version
+                    highest_version_file=$file
+                fi
+            fi
+        done
+
+        echo "Highest version for prefix $prefix: $highest_version_file"
+
+        # Delete all other files except the one with the highest version
+        for file in "${files[@]}"; do
+            if [[ $file != "$highest_version_file" ]]; then
+                echo "Deleting $file"
+                rm "$file"
+            fi
+        done
+    done
+}
+
+# Copy graphic blob directories under the Live Image Firmware folder
+for dir in "${BLOB_DIRS[@]}"; do
+    cd "$dir"
+    if [ "$?" -ne 0 ]; then
+        echo "Directory: $dir does not exist."
         continue
     fi
 
-    # Variable to hold the highest version file
-    highest_version_file=""
-    highest_version=""
-
-    # Loop through files to determine the highest version
-    for file in "${files[@]}"; do
-        version=$(echo "$file" | sed -r "s/^${prefix}_([0-9]+\.[0-9]+\.[0-9]+)\.bin$/\1/")
-        
-        if [[ -z $highest_version ]]; then
-            highest_version=$version
-            highest_version_file=$file
-        else
-            compare_versions "$version" "$highest_version"
-            result=$?
-            if [[ $result -eq 1 ]]; then
-                highest_version=$version
-                highest_version_file=$file
-            fi
-        fi
-    done
-
-    echo "Highest version for prefix $prefix: $highest_version_file"
-
-    # Delete all other files except the one with the highest version
-    for file in "${files[@]}"; do
-        if [[ $file != "$highest_version_file" ]]; then
-            echo "Deleting $file"
-            rm "$file"
-        fi
-    done
+    find_newest_version
+    cd -
+    cp -r "$dir" "$TARGET_PATH"
 done
-
-cd -
-
-cp -r $FIRMWARE_PATH"i915" $TARGET_PATH
 
 # Remove intelnext repo
 rm -rf $FIRMWARE_PATH
