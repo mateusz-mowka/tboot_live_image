@@ -15,7 +15,7 @@ efi_part_uuid=$(uuidgen)
 
 # Boot partition offset and size, in 512-byte sectors
 efi_part_start=64
-efi_part_size=$(( 104857600 / 512 )) # 100MB
+efi_part_size=$(( 536870912 / 512 )) # 512MB
 
 first_lba=34
 last_lba=$(( efi_part_start + efi_part_size ))
