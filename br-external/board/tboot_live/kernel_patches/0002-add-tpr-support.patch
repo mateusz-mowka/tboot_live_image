@@ -1,8 +1,16 @@
 diff --git a/arch/x86/kernel/tboot.c b/arch/x86/kernel/tboot.c
-index 3764f28ece15..ac3cc30490d7 100644
+index 46b8f1f16676..04929aba6a5c 100644
 --- a/arch/x86/kernel/tboot.c
 +++ b/arch/x86/kernel/tboot.c
-@@ -467,8 +467,14 @@ struct sha1_hash {
+@@ -18,6 +18,7 @@
+ #include <linux/mm.h>
+ #include <linux/tboot.h>
+ #include <linux/debugfs.h>
++#include <linux/printk.h>
+ 
+ #include <asm/realmode.h>
+ #include <asm/processor.h>
+@@ -453,8 +454,14 @@ struct sha1_hash {
  	u8 hash[SHA1_SIZE];
  };
  
@@ -18,7 +26,7 @@ index 3764f28ece15..ac3cc30490d7 100644
  	struct sha1_hash  bios_acm_id;
  	u32               edx_senter_flags;
  	u64               mseg_valid;
-@@ -483,8 +489,18 @@ struct sinit_mle_data {
+@@ -469,8 +476,18 @@ struct sinit_mle_data {
  	u32               mdrs_off;
  	u32               num_vtd_dmars;
  	u32               vtd_dmars_off;
@@ -37,7 +45,7 @@ index 3764f28ece15..ac3cc30490d7 100644
  struct acpi_table_header *tboot_get_dmar_table(struct acpi_table_header *dmar_tbl)
  {
  	void *heap_base, *heap_ptr, *config;
-@@ -528,3 +544,85 @@ struct acpi_table_header *tboot_get_dmar_table(struct acpi_table_header *dmar_tb
+@@ -514,3 +531,93 @@ struct acpi_table_header *tboot_get_dmar_table(struct acpi_table_header *dmar_tb
  
  	return dmar_tbl;
  }
@@ -48,6 +56,7 @@ index 3764f28ece15..ac3cc30490d7 100644
 +	struct sinit_mle_data *sinit_mle;
 +	struct heap_ext_data_elt *elt;
 +	u64 sinit_mle_size;
++
 +	if (!tboot_enabled())
 +		return NULL;
 +	/*
@@ -85,21 +94,21 @@ index 3764f28ece15..ac3cc30490d7 100644
 +
 +	elt = sinit_mle->ext_data_elts;
 +	while (elt->type != HEAP_EXTDATA_TYPE_DTPR) {
-+		elt = (void*)elt + elt->size;
-+		if ((u64)elt > (u64)sinit_mle + sinit_mle_size) {
++		elt = (void *)elt + elt->size;
++		if ((u64)elt > (u64)sinit_mle + sinit_mle_size)
 +			return NULL;
-+		}
 +	}
 +	return (struct acpi_table_dtpr *)elt->data;
 +}
 +
-+static bool tboot_tpr_enabled = 0;
++static bool tboot_tpr_enabled;
 +void tboot_parse_dtpr_table(void)
 +{
 +	struct acpi_table_dtpr *dtpr;
 +	struct acpi_dtpr_instance *tpr_inst;
 +	u32 *instance_cnt;
 +	u32 i, j;
++
 +	if (!tboot_enabled())
 +		return;
 +	dtpr = tboot_get_dtpr_table();
@@ -111,24 +120,30 @@ index 3764f28ece15..ac3cc30490d7 100644
 +	for (i = 0; i < *instance_cnt; ++i) {
 +		for (j = 0; j < tpr_inst->tpr_cnt; ++j) {
 +			uint64_t *base = ioremap(tpr_inst->tpr_array[j].base, 16);
-+			printk("TPR instance %d, TPR %d:base %llx limit %llx\n", i, j, readq(base), readq(base + 1));
-+			*base |= (1 << 4);
-+			iounmap(base);
++
++			if (base != NULL) {
++				pr_info("TPR instance %d, TPR %d:base %llx limit %llx\n",
++					   i, j, readq(base), readq(base + 1));
++				*base |= (1 << 4);
++				iounmap(base);
++			}
 +		}
-+		tpr_inst = (struct acpi_dtpr_instance *)((u8*)tpr_inst + sizeof(*tpr_inst) + j*sizeof(*(tpr_inst->tpr_array)));
++		tpr_inst = (struct acpi_dtpr_instance *)((u8 *)tpr_inst
++		 + sizeof(*tpr_inst) + j*sizeof(*(tpr_inst->tpr_array)));
 +	}
 +	if (tboot_tpr_enabled)
 +		pr_debug("TPR protection detected, PMR will be disabled\n");
 +}
 +
-+bool tboot_is_tpr_enabled() {
-+	return tboot_tpr_enabled;}
-\ No newline at end of file
++bool tboot_is_tpr_enabled(void)
++{
++	return tboot_tpr_enabled;
++}
 diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
-index 8d53bac7c719..c9458573315d 100644
+index ec975c73cfe6..9c6f93cf1b3f 100644
 --- a/drivers/iommu/intel/dmar.c
 +++ b/drivers/iommu/intel/dmar.c
-@@ -669,6 +669,7 @@ static int __init
+@@ -635,6 +635,7 @@ static int __init
  parse_dmar_table(void)
  {
  	struct acpi_table_dmar *dmar;
@@ -136,7 +151,7 @@ index 8d53bac7c719..c9458573315d 100644
  	int drhd_count = 0;
  	int ret;
  	struct dmar_res_callback cb = {
-@@ -704,6 +705,13 @@ parse_dmar_table(void)
+@@ -670,6 +671,13 @@ parse_dmar_table(void)
  		return -EINVAL;
  	}
  
@@ -151,10 +166,10 @@ index 8d53bac7c719..c9458573315d 100644
  	ret = dmar_walk_dmar_table(dmar, &cb);
  	if (ret == 0 && drhd_count == 0)
 diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 897159dba47d..1995f6e3a10d 100644
+index e236c7ec221f..5847fb589c89 100644
 --- a/drivers/iommu/intel/iommu.c
 +++ b/drivers/iommu/intel/iommu.c
-@@ -3768,6 +3768,11 @@ static __init int tboot_force_iommu(void)
+@@ -3017,6 +3017,11 @@ static __init int tboot_force_iommu(void)
  	if (!tboot_enabled())
  		return 0;
  
@@ -166,7 +181,7 @@ index 897159dba47d..1995f6e3a10d 100644
  	if (no_iommu || dmar_disabled)
  		pr_warn("Forcing Intel-IOMMU to enabled\n");
  
-@@ -3825,7 +3830,7 @@ int __init intel_iommu_init(void)
+@@ -3074,7 +3079,7 @@ int __init intel_iommu_init(void)
  		 * calling SENTER, but the kernel is expected to reset/tear
  		 * down the PMRs.
  		 */
@@ -176,7 +191,7 @@ index 897159dba47d..1995f6e3a10d 100644
  				iommu_disable_protect_mem_regions(iommu);
  		}
 diff --git a/include/acpi/actbl1.h b/include/acpi/actbl1.h
-index a33375e055ad..b17ed86b573c 100644
+index 7f35eb0e8458..c77b0890970c 100644
 --- a/include/acpi/actbl1.h
 +++ b/include/acpi/actbl1.h
 @@ -47,6 +47,7 @@
@@ -187,7 +202,7 @@ index a33375e055ad..b17ed86b573c 100644
  
  #define ACPI_SIG_S3PT           "S3PT"	/* S3 Performance (sub)Table */
  #define ACPI_SIG_PCCS           "PCC"	/* PCC Shared Memory Region */
-@@ -1939,6 +1940,90 @@ struct acpi_ibft_target {
+@@ -1973,6 +1974,91 @@ struct acpi_ibft_target {
  	u16 reverse_chap_secret_offset;
  };
  
@@ -216,61 +231,62 @@ index a33375e055ad..b17ed86b573c 100644
 +	struct acpi_tpr_array tpr_array[];
 +};
 +
-+/******************************************************************************* 
++/*******************************************************************************
 + * TPRn_BASE
-+ * 
-+ * Specifies the start address of TPRn region. TPR region address and size must 
-+ * be with 1MB resolution. These bits are compared with the result of the 
-+ * TPRn_LIMIT[63:20] * applied to the incoming address, to determine if an 
-+ * access fall within the TPRn defined region. 
-+******************************************************************************/
++ *
++ * Specifies the start address of TPRn region. TPR region address and size must
++ * be with 1MB resolution. These bits are compared with the result of the
++ * TPRn_LIMIT[63:20] * applied to the incoming address, to determine if an
++ * access fall within the TPRn defined region.
++ ******************************************************************************/
 +struct acpi_dtprn_base_reg {
 +	u64 reserved0 : 3;
 +	u64 rw : 1; // access: 1 == RO, 0 == RW (for TPR must be RW)
 +	u64 enable : 1; // 0 == range enabled, 1 == range disabled
 +	u64 reserved1 : 15;
-+	u64 tpr_base_rw : 44; // Minimal TPRn_Base resolution is 1MB.
-+						  // Applied to the incoming address, to determine if an access 
-+						  // fall within the TPRn defined region.
-+						  // Width is determined by a bus width which can be obtained
-+						  // via CPUID function 0x80000008. 
++	// Minimal TPRn_Base resolution is 1MB.
++	// Applied to the incoming address, to determine if an access
++	// fall within the TPRn defined region.
++	// Width is determined by a bus width which can be obtained
++	// via CPUID function 0x80000008.
++	u64 tpr_base_rw : 44;
 +	//u64 unused : 1;
 +};
 +
-+/******************************************************************************* 
++/*******************************************************************************
 + * TPRn_LIMIT
-+ * 
++ *
 + * This register defines an isolated region of memory that can be enabled
 + * to prohibit certain system agents from accessing memory. When an agent
 + * sends a request upstream, whether snooped or not, a TPR prevents that
-+ * transaction from changing the state of memory. 
-+******************************************************************************/
++ * transaction from changing the state of memory.
++ ******************************************************************************/
 +
 +struct acpi_dtprn_limit_reg {
 +	u64 reserved0 : 3;
 +	u64 rw : 1; // access: 1 == RO, 0 == RW (for TPR must be RW)
 +	u64 enable : 1; // 0 == range enabled, 1 == range disabled
 +	u64 reserved1 : 15;
-+	u64 tpr_limit_rw : 44; // Minimal TPRn_Limit resolution is 1MB.
-+						   // These bits define TPR limit address.
-+						   // Width is determined by a bus width.
-+
++	// Minimal TPRn_Limit resolution is 1MB.
++	// These bits define TPR limit address.
++	// Width is determined by a bus width.
++	u64 tpr_limit_rw : 44;
 +	//u64 unused : 1;
 +};
 +
-+/******************************************************************************* 
++/*******************************************************************************
 + * SERIALIZE_REQUEST
-+ * 
++ *
 + * This register is used to request serialization of non-coherent DMA
 + * transactions. OS shall  issue it before changing of TPR settings
 + * (base / size).
-+******************************************************************************/
++ ******************************************************************************/
 +
 +struct acpi_tpr_serialize_request {
 +	u64 sts : 1; // Status of serialization request (RO)
-+	             // 0 == register idle, 1 == serialization in progress
++				// 0 == register idle, 1 == serialization in progress
 +	u64 ctrl : 1; // Control field to initiate serialization (RW)
-+	              // 0 == normal, 1 == initialize serialization
++				// 0 == normal, 1 == initialize serialization
 +				  // (self-clear to allow multiple serialization requests)
 +	u64 unused : 62;
 +};
@@ -279,7 +295,7 @@ index a33375e055ad..b17ed86b573c 100644
  
  #pragma pack()
 diff --git a/include/linux/tboot.h b/include/linux/tboot.h
-index d2279160ef39..841559ab70d1 100644
+index d2279160ef39..95f784b0bde0 100644
 --- a/include/linux/tboot.h
 +++ b/include/linux/tboot.h
 @@ -126,6 +126,9 @@ extern void tboot_probe(void);
@@ -296,7 +312,7 @@ index d2279160ef39..841559ab70d1 100644
  #define tboot_sleep(sleep_state, pm1a_control, pm1b_control)	\
  					do { } while (0)
  #define tboot_get_dmar_table(dmar_tbl)	(dmar_tbl)
-+#define tboot_get_dtpr_table() do { } while (0)
++#define tboot_get_dtpr_table() 0
 +#define tboot_parse_dtpr_table() do { } while (0)
 +#define tboot_is_tpr_enabled() 0
  
