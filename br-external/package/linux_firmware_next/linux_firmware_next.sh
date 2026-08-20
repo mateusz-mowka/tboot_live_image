@@ -17,7 +17,9 @@ git -C $FIRMWARE_PATH sparse-checkout set --no-cone /i915 '!*/i915' /xe '!*/xe'
 git -C $FIRMWARE_PATH checkout master
 
 # List of prefixes to search for
-prefixes=("adlp_guc" "bxt_guc" "cml_guc" "dg1_guc" "dg1_huc" "dg2_guc" "ehl_guc" "glk_guc" "icl_guc" "kbl_guc" "mtl_gsc" "mtl_guc" "ptl_guc" "pvc_guc")
+prefixes=("adlp_guc" "bxt_guc" "cml_guc" "dg1_guc" "dg1_huc" "dg2_guc"
+          "ehl_guc" "glk_guc" "icl_guc" "kbl_guc" "mtl_gsc" "mtl_guc" "ptl_guc"
+          "pvc_guc" "nvl_guc" "nvlpg_guc" "nvlpm_guc")
 
 # Function to compare two version strings X.Y.Z
 compare_versions() {
