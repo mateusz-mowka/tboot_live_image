@@ -106,3 +106,6 @@ v3.10.0_intel-next-6.18-2025-12-12
   * Buildroot 2026.02.1
   * Fixed compilation errors for GCC 15
   * Added Kernel patch disabling TPRs prior to S3 resume
+
+v3.10.1_intel-next-6.18-2025-12-12
+  * TBOOT 1.12.1
